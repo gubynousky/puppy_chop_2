@@ -54,7 +54,7 @@ function ContactoPage() {
           ¡Hablemos!
         </h2>
         <p style={{ fontSize: '18px', color: '#6b7280' }}>
-          Comentanos tus dudas 🐾
+          Comentanos tus temas de interés 🐾
         </p>
       </section>
 

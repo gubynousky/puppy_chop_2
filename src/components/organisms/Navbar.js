@@ -1,12 +1,10 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Home, Search, Dog } from 'lucide-react';
+import { ShoppingCart, Home, Search, Dog, Mail } from 'lucide-react';
 
 function Navbar({ cantidadCarrito }) {
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
-
-  console.log('Navbar renderizado - items en carrito:', cantidadCarrito);
 
   return (
     <nav style={{
@@ -22,62 +20,50 @@ function Navbar({ cantidadCarrito }) {
         alignItems: 'center',
         justifyContent: 'space-between'
       }}>
-        <Link
-          to="/"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            fontSize: '24px',
-            fontWeight: 'bold',
-            color: 'white',
-            textDecoration: 'none'
-          }}
-        >
+        <Link to="/" style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          fontSize: '24px',
+          fontWeight: 'bold',
+          color: 'white',
+          textDecoration: 'none'
+        }}>
           <Dog size={32} />
           PuppyChop
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <Link
-            to="/"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              color: 'white',
-              textDecoration: 'none',
-              fontWeight: isActive('/') ? 'bold' : 'normal'
-            }}
-          >
+          <Link to="/" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            color: 'white',
+            textDecoration: 'none',
+            fontWeight: isActive('/') ? 'bold' : 'normal'
+          }}>
             <Home size={20} />
             Inicio
           </Link>
-          <Link
-            to="/catalogo"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              color: 'white',
-              textDecoration: 'none',
-              fontWeight: isActive('/catalogo') ? 'bold' : 'normal'
-            }}
-          >
+          <Link to="/catalogo" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            color: 'white',
+            textDecoration: 'none',
+            fontWeight: isActive('/catalogo') ? 'bold' : 'normal'
+          }}>
             <Search size={20} />
             Catálogo
           </Link>
-          <Link
-            to="/carrito"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              color: 'white',
-              textDecoration: 'none',
-              position: 'relative',
-              fontWeight: isActive('/carrito') ? 'bold' : 'normal'
-            }}
-          >
+          <Link to="/carrito" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            color: 'white',
+            textDecoration: 'none',
+            position: 'relative',
+            fontWeight: isActive('/carrito') ? 'bold' : 'normal'
+          }}>
             <ShoppingCart size={20} />
             Carrito
             {cantidadCarrito > 0 && (
@@ -99,6 +85,17 @@ function Navbar({ cantidadCarrito }) {
                 {cantidadCarrito}
               </span>
             )}
+          </Link>
+          <Link to="/contacto" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            color: 'white',
+            textDecoration: 'none',
+            fontWeight: isActive('/contacto') ? 'bold' : 'normal'
+          }}>
+            <Mail size={20} />
+            Contacto
           </Link>
         </div>
       </div>

@@ -110,23 +110,6 @@ function CatalogoPage({ onAgregarAlCarrito }) {
           </p>
         </div>
       )}
-
-      <div style={{
-        marginTop: '24px',
-        padding: '16px',
-        backgroundColor: '#cffafe',
-        borderRadius: '8px'
-      }}>
-        <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>
-          💡 SOLUCION: La URL actual es:
-        </p>
-        <code style={{ backgroundColor: 'white', padding: '8px', borderRadius: '4px', display: 'block' }}>
-          {window.location.href}
-        </code>
-        <p style={{ fontSize: '14px', color: '#0e7490', marginTop: '8px' }}>
-          Esta URL contiene todos los filtros. Puedes recargar (F5), compartirla o guardarla en favoritos.
-        </p>
-      </div>
     </div>
   );
 }
