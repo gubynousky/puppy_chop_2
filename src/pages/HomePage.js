@@ -1,21 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Package, ShoppingCart } from 'lucide-react';
+import { Package, ShoppingCart, Mail } from 'lucide-react';
 import Button from '../components/atoms/Button';
 
 function HomePage() {
-  console.log('HomePage montada');
-
   return (
-    <div style={{ textAlign: 'center', padding: '0' }}>
-      
-      {/* IMAGEN */}
+    <div style={{ textAlign: 'center', padding: '0', marginBottom: '0' }}>
       <div style={{ marginBottom: '20px', marginTop: '0' }}>
         <img 
           src="/puppy.png"
           alt="Perrito PuppyChop" 
           style={{
-            width: '550px',
+            width: '500px',
             height: 'auto',
             objectFit: 'contain',
             display: 'block',
@@ -57,9 +53,13 @@ function HomePage() {
             Ver Carrito
           </Button>
         </Link>
+        <Link to="/contacto">
+          <Button variant="success" icon={Mail}>
+            Contáctanos
+          </Button>
+        </Link>
       </div>
 
-      {/* Tarjetas SIN margen abajo */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
