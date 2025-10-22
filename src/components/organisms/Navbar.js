@@ -29,7 +29,7 @@ function Navbar({ cantidadCarrito }) {
           color: 'white',
           textDecoration: 'none'
         }}>
-          <Dog size={32} />
+          <span style={{ fontSize: '2rem' }}>🐶</span>
           PuppyChop
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
