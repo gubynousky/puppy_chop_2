@@ -10,7 +10,7 @@ function CartItem({ item, onIncrement, onDecrement, onRemove }) {
         alignItems: 'center',
         gap: '16px',
         padding: '16px',
-        backgroundColor: '#ffedd5',
+        backgroundColor: 'white',
         borderRadius: '8px',
         marginBottom: '12px',
         flexWrap: 'wrap'
