@@ -102,4 +102,4 @@ function CarritoPage({ carrito, onIncrement, onDecrement, onRemove, onVaciar }) 
   );
 }
 
-export default CarritoPage;
+export default CarritoPage;
