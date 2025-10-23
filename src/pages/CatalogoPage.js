@@ -14,25 +14,21 @@ function CatalogoPage({ onAgregarAlCarrito }) {
   console.log('URL actual:', window.location.href);
   console.log('location.search:', location.search);
 
-  // paso 1: leer filtros desde la URL con URLSearchParams
   const queryParams = new URLSearchParams(location.search);
   const categoriaURL = queryParams.get('categoria') || '';
   const precioMinURL = queryParams.get('precioMin') || '';
 
   console.log('Filtros leidos desde URL:', { categoria: categoriaURL, precioMin: precioMinURL });
 
-  // paso 2: estado local sincronizado con URL
   const [categoria, setCategoria] = useState(categoriaURL);
   const [precioMin, setPrecioMin] = useState(precioMinURL);
 
-  // paso 3: sincronizar estado con URL cuando cambia
   useEffect(() => {
     console.log('useEffect: URL cambió, actualizando estado local');
     setCategoria(categoriaURL);
     setPrecioMin(precioMinURL);
-  }, [location.search]);
+  }, [location.search, categoriaURL, precioMinURL]);
 
-  // paso 4: filtrar productos según URL
   const productosFiltrados = productosDisponibles.filter(producto => {
     const matchCategoria = !categoriaURL || producto.categoria === categoriaURL;
     const matchPrecio = !precioMinURL || producto.precio >= parseInt(precioMinURL);
@@ -41,7 +37,6 @@ function CatalogoPage({ onAgregarAlCarrito }) {
 
   console.log('Productos filtrados:', productosFiltrados.length, 'de', productosDisponibles.length);
 
-  // paso 5: aplicar filtros = actualizar URL
   const handleAplicarFiltros = () => {
     console.log('Aplicando filtros y actualizando URL');
     const params = new URLSearchParams();
@@ -52,9 +47,10 @@ function CatalogoPage({ onAgregarAlCarrito }) {
     navigate(newURL);
   };
 
-  // paso 6: limpiar filtros = navegar sin query strings
   const handleLimpiarFiltros = () => {
     console.log('Limpiando filtros');
+    setCategoria('');
+    setPrecioMin('');
     navigate('/catalogo');
   };
 
@@ -67,10 +63,11 @@ function CatalogoPage({ onAgregarAlCarrito }) {
         marginBottom: '24px',
         display: 'flex',
         alignItems: 'center',
-        gap: '8px'
+        gap: '8px',
+        flexWrap: 'wrap'
       }}>
         <Package size={32} />
-        Catálogo de Productos
+        <span>Catálogo de Productos</span>
       </h1>
 
       <FilterBar
@@ -88,11 +85,14 @@ function CatalogoPage({ onAgregarAlCarrito }) {
         </Badge>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-        gap: '24px'
-      }}>
+      <div 
+        className="products-grid"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+          gap: '24px'
+        }}
+      >
         {productosFiltrados.map(producto => (
           <ProductCard
             key={producto.id}
@@ -103,10 +103,10 @@ function CatalogoPage({ onAgregarAlCarrito }) {
       </div>
 
       {productosFiltrados.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '48px 0' }}>
+        <div style={{ textAlign: 'center', padding: '48px 20px' }}>
           <div style={{ fontSize: '60px', marginBottom: '16px' }}>😢</div>
           <p style={{ fontSize: '20px', color: '#6b7280' }}>
-            No se encontraron productos
+            No se encontraron productos con estos filtros
           </p>
         </div>
       )}
