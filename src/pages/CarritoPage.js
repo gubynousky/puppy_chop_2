@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Package, Trash2 } from 'lucide-react';
@@ -104,5 +102,4 @@ function CarritoPage({ carrito, onIncrement, onDecrement, onRemove, onVaciar }) 
   );
 }
 
-export default CarritoPage;
->>>>>>> origin/katty
+export default CarritoPage;

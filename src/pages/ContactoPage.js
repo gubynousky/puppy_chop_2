@@ -111,7 +111,7 @@ function ContactoPage() {
           fontSize: '18px',
           color: '#6b7280'
         }}>
-          Encuentra todo lo que tu perrito necesita y hazlo feliz 🐾
+          Cuéntanos sobre tu proyecto y hagámoslo realidad 🐾
         </p>
       </section>
 
@@ -145,10 +145,10 @@ function ContactoPage() {
                 marginBottom: '12px',
                 color: '#ea580c'
               }}>
-                ¿Buscas juguetes, accesorios o snacks para tu mejor amigo?
+                ¿Tienes una idea brillante? ¿Un proyecto desafiante?
               </h3>
               <p style={{ color: '#6b7280', marginBottom: '8px' }}>
-                Nos encanta ayudarte a consentir a tu peludo con productos de calidad.
+                Nos encanta colaborar con personas apasionadas.
               </p>
               <p style={{ color: '#16a34a', fontWeight: 'bold' }}>
                 Tendrás una respuesta en menos de 24 horas
@@ -596,7 +596,7 @@ function ContactoPage() {
         </div>
       </section>
 
-{/* PREGUNTAS FRECUENTES */}
+     {/* PREGUNTAS FRECUENTES */}
 <section style={{
   marginTop: '60px',
   padding: '40px 20px',
