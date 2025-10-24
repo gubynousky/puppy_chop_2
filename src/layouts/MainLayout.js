@@ -3,12 +3,12 @@ import { Outlet } from 'react-router-dom';
 import Navbar from '../components/organisms/Navbar';
 
 
-function MainLayout({ cantidadCarrito }) {
+function MainLayout({ cantidadCarrito, carrito }) {
   console.log('MainLayout montado - carrito tiene', cantidadCarrito, 'items');
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#ffedd5', overflow: 'visible' }}>
-      <Navbar cantidadCarrito={cantidadCarrito} />
+      <Navbar cantidadCarrito={cantidadCarrito} carrito={carrito} />
       <div
         className="main-container"
         style={{
@@ -28,10 +28,10 @@ function MainLayout({ cantidadCarrito }) {
         marginTop: '48px'
       }}>
         <p style={{ fontWeight: '600', marginBottom: '8px' }}>
-          🐾 PuppyChop - Hecho con amor para tu perrito
+          🐾 PuppyChop © 2025 - Hecho con ❤️ para tu perrito
         </p>
         <p style={{ fontSize: '14px' }}>
-          PuppyChop © 2025. Todos los derechos reservados
+          Proyecto educativo - Semana 6 - Desarrollo Fullstack II (DSY1104)
         </p>
       </footer>
     </div>

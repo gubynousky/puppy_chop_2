@@ -70,7 +70,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<MainLayout cantidadCarrito={cantidadTotal} />}>
+        <Route path="/" element={<MainLayout cantidadCarrito={cantidadTotal} carrito={carrito} />}>
           <Route index element={<HomePage />} />
           <Route path="catalogo" element={<CatalogoPage onAgregarAlCarrito={agregarAlCarrito} />} />
           <Route path="carrito" element={
