@@ -28,10 +28,10 @@ function MainLayout({ cantidadCarrito, carrito }) {
         marginTop: '48px'
       }}>
         <p style={{ fontWeight: '600', marginBottom: '8px' }}>
-          🐾 PuppyChop © 2025 - Hecho con ❤️ para tu perrito
+          🐾 PuppyChop © 2025 - Hecho con amor para tu perrito
         </p>
         <p style={{ fontSize: '14px' }}>
-          Proyecto educativo - Semana 6 - Desarrollo Fullstack II (DSY1104)
+          PuppyChop © 2025. Todos los derechos reservados
         </p>
       </footer>
     </div>
