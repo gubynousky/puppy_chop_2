@@ -1,4 +1,5 @@
-// src/__tests__/PuppyChop.spec.jsx
+// src/__tests__/puppychop.spec.jsx
+// VERSIÓN ORIGINAL - JASMINE (para Karma)
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -202,7 +203,7 @@ describe('PuppyChop - Pruebas Unitarias Completas', () => {
       setTimeout(done, 300);
     });
 
-    // TU TEST ORIGINAL - SIN MODIFICACIONES
+    // VERSIÓN ORIGINAL JASMINE (sin jest.)
     it('debe mostrar error con email sin @', (done) => {
       spyOn(window, 'fetch').and.returnValue(
         Promise.resolve({
