@@ -37,40 +37,46 @@ function ContactoPage() {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log('Formulario enviado:', formData);
 
-    try {
-      const response = await fetch('http://localhost:5000/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  console.log('Formulario enviado:', formData);
+
+  try {
+    // Usar servidor local en desarrollo, /api en producción
+    const apiUrl = process.env.NODE_ENV === 'production' 
+      ? '/api/contact' 
+      : 'http://localhost:5000/api/contact';
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert('¡Mensaje enviado correctamente! 🐕 Te contactaremos pronto.');
+      setFormData({
+        nombre: '',
+        email: '',
+        servicio: '',
+        presupuesto: '',
+        asunto: '',
+        mensaje: ''
       });
-
-      const data = await response.json();
-
-      if (data.success) {
-        alert('¡Mensaje enviado correctamente! 🐕 Te contactaremos pronto.');
-        setFormData({
-          nombre: '',
-          email: '',
-          servicio: '',
-          presupuesto: '',
-          asunto: '',
-          mensaje: ''
-        });
-        setCharCount(0);
-      } else {
-        alert('Error al enviar el mensaje: ' + data.message);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error de conexión. Verifica que el servidor esté corriendo en el puerto 5000.');
+      setCharCount(0);
+    } else {
+      alert('Error al enviar el mensaje: ' + data.message);
     }
-  };
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error de conexión. Por favor intenta nuevamente.');
+  }
+};
 
   // Opciones para los selects
   const servicioOptions = [

@@ -25,3 +25,11 @@ yarn-error.log*
 # Backend
 server/.env
 server/node_modules
+
+# Variables de entorno
+.env
+.env.local
+.env.production
+
+# Carpeta server (ya no la necesitas en producción)
+server/
