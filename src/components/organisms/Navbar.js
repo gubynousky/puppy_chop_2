@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Home, Search, Dog, Mail } from 'lucide-react';
+import { ShoppingCart, Home, Search, Dog, UserPlus } from 'lucide-react';
 import CartDropdown from './CartDropdown';
 
 function Navbar({ cantidadCarrito, carrito }) {
@@ -139,20 +139,20 @@ function Navbar({ cantidadCarrito, carrito }) {
             </button>
             
             <Link
-              to="/contacto"
+              to="/registro"
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
                 color: 'white',
                 textDecoration: 'none',
-                fontWeight: isActive('/contacto') ? 'bold' : 'normal',
+                fontWeight: isActive('/registro') ? 'bold' : 'normal',
                 fontSize: '16px',
                 whiteSpace: 'nowrap'
               }}
             >
-              <Mail size={20} />
-              <span>Contacto</span>
+              <UserPlus size={20} />
+              <span>Registro</span>
             </Link>
           </div>
         </div>

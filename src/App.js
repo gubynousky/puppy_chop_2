@@ -5,7 +5,7 @@ import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/HomePage';
 import CatalogoPage from './pages/CatalogoPage';
 import CarritoPage from './pages/CarritoPage';
-import ContactoPage from './pages/ContactoPage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   const [carrito, setCarrito] = useState(() => {
@@ -82,7 +82,7 @@ function App() {
               onVaciar={vaciarCarrito}
             />
           } />
-          <Route path="contacto" element={<ContactoPage />} />
+          <Route path="registro" element={<RegisterPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
