@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, Dog, Heart, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
 import Button from '../components/atoms/Button';
-import { productosDisponibles, categorias } from '../data/productos';
+import { categorias } from '../data/productos';
+import authService from '../services/authService';
+import petProfileService from '../services/petProfileService';
+import favoritoService from '../services/favoritoService';
+import productoService from '../services/productoService';
 
 function RegisterPage() {
   console.log('RegisterPage montada');
+  const navigate = useNavigate();
 
   // Estado del formulario dividido en 3 pasos
   const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   
   // Paso 1: Información Personal
   const [userData, setUserData] = useState({
@@ -35,6 +43,36 @@ function RegisterPage() {
   const [productosFavoritos, setProductosFavoritos] = useState([]);
   const [notificarOfertas, setNotificarOfertas] = useState(true);
 
+  // NUEVO: Estados para productos del backend
+  const [productosBackend, setProductosBackend] = useState([]);
+  const [productosFiltered, setProductosFiltered] = useState([]);
+
+  // NUEVO: Cargar productos del backend al montar
+  useEffect(() => {
+    cargarProductosDelBackend();
+  }, []);
+
+  // NUEVO: Filtrar productos cuando cambian las categorías
+  useEffect(() => {
+    if (productosBackend.length > 0) {
+      const filtrados = productosBackend.filter(p => 
+        categoriasSeleccionadas.includes(p.categoria)
+      );
+      setProductosFiltered(filtrados);
+    }
+  }, [categoriasSeleccionadas, productosBackend]);
+
+  // NUEVO: Función para cargar productos desde el backend
+  const cargarProductosDelBackend = async () => {
+    try {
+      const productos = await productoService.obtenerProductos();
+      setProductosBackend(productos);
+    } catch (err) {
+      console.error('Error al cargar productos:', err);
+      setError('Error al cargar productos del servidor');
+    }
+  };
+
   // Handlers para Paso 1
   const handleUserDataChange = (e) => {
     const { name, value } = e.target;
@@ -42,6 +80,7 @@ function RegisterPage() {
       ...userData,
       [name]: value
     });
+    setError(''); // Limpiar error al escribir
   };
 
   // Handlers para Paso 2
@@ -51,6 +90,7 @@ function RegisterPage() {
       ...petData,
       [name]: value
     });
+    setError(''); // Limpiar error al escribir
   };
 
   // Handlers para Paso 3
@@ -70,35 +110,175 @@ function RegisterPage() {
     }
   };
 
-  const productosFiltered = productosDisponibles.filter(producto =>
-    categoriasSeleccionadas.includes(producto.categoria)
-  );
+  // NUEVO: Validaciones
+  const validarPaso1 = () => {
+    if (!userData.nombre || !userData.apellido || !userData.email || 
+        !userData.password || !userData.telefono || !userData.fechaNacimiento) {
+      setError('Todos los campos son obligatorios');
+      return false;
+    }
+
+    if (userData.password !== userData.confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return false;
+    }
+
+    if (userData.password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      return false;
+    }
+
+    return true;
+  };
+
+  const validarPaso2 = () => {
+    if (!petData.nombreMascota || !petData.raza || !petData.edad || 
+        !petData.peso || !petData.tamaño) {
+      setError('Todos los campos de la mascota son obligatorios');
+      return false;
+    }
+
+    if (petData.edad < 0 || petData.edad > 30) {
+      setError('La edad debe estar entre 0 y 30 años');
+      return false;
+    }
+
+    if (petData.peso <= 0) {
+      setError('El peso debe ser mayor a 0');
+      return false;
+    }
+
+    return true;
+  };
 
   // Navegación entre pasos
   const nextStep = () => {
+    setError('');
+    
+    if (currentStep === 1 && !validarPaso1()) {
+      return;
+    }
+    
+    if (currentStep === 2 && !validarPaso2()) {
+      return;
+    }
+    
     if (currentStep < 3) setCurrentStep(currentStep + 1);
   };
 
   const prevStep = () => {
+    setError('');
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  // Submit final
-  const handleSubmit = (e) => {
+  // CORREGIDO: Submit final con mejor manejo de errores
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const registroCompleto = {
-      usuario: userData,
-      mascota: petData,
-      favoritos: {
-        categorias: categoriasSeleccionadas,
-        productos: productosFavoritos,
-        notificarOfertas: notificarOfertas
-      }
-    };
+    setLoading(true);
+    setError('');
 
-    console.log('Registro completo:', registroCompleto);
-    alert('¡Registro exitoso! (Por ahora solo en consola, falta conectar con Spring Boot)');
+    try {
+      // 1. Registrar usuario
+      const userPayload = {
+        nombre: userData.nombre.trim(),
+        apellido: userData.apellido.trim(),
+        email: userData.email.trim().toLowerCase(),
+        password: userData.password,
+        telefono: userData.telefono.trim(),
+        fechaNacimiento: userData.fechaNacimiento,
+      };
+
+      console.log('=== PASO 1: REGISTRANDO USUARIO ===');
+      console.log('Payload usuario:', JSON.stringify(userPayload, null, 2));
+      
+      const userResponse = await authService.registrarUsuario(userPayload);
+      console.log('Respuesta del servidor:', userResponse);
+      
+      if (!userResponse || !userResponse.usuario || !userResponse.usuario.id) {
+        throw new Error('Respuesta inválida del servidor al registrar usuario');
+      }
+      
+      const userId = userResponse.usuario.id;
+      console.log('✓ Usuario creado con ID:', userId);
+
+      // 2. Crear perfil de mascota
+      const petPayload = {
+        nombreMascota: petData.nombreMascota.trim(),
+        tipo: petData.tipo,
+        raza: petData.raza.trim() || 'Sin especificar',
+        edad: parseInt(petData.edad, 10),
+        peso: parseFloat(petData.peso),
+        tamaño: petData.tamaño,
+      };
+
+      console.log('=== PASO 2: CREANDO PERFIL MASCOTA ===');
+      console.log('Payload mascota:', JSON.stringify(petPayload, null, 2));
+      
+      const petResponse = await petProfileService.crearPerfilMascota(userId, petPayload);
+      console.log('Respuesta mascota:', petResponse);
+      console.log('✓ Perfil de mascota creado');
+
+      // 3. Agregar productos favoritos (solo si hay favoritos seleccionados)
+      if (productosFavoritos.length > 0) {
+        console.log('=== PASO 3: AGREGANDO FAVORITOS ===');
+        console.log('Total de favoritos a agregar:', productosFavoritos.length);
+        
+        for (const productoId of productosFavoritos) {
+          const producto = productosBackend.find(p => p.id === productoId);
+          if (producto) {
+            console.log(`Agregando favorito: ${producto.nombre} (ID: ${productoId})`);
+            try {
+              await favoritoService.agregarFavorito(
+                userId,
+                productoId,
+                producto.categoria,
+                notificarOfertas
+              );
+              console.log(`✓ Favorito agregado: ${producto.nombre}`);
+            } catch (favError) {
+              console.error(`Error al agregar favorito ${productoId}:`, favError);
+              // Continuar con los demás favoritos aunque uno falle
+            }
+          }
+        }
+        console.log('✓ Favoritos procesados');
+      } else {
+        console.log('=== PASO 3: SIN FAVORITOS SELECCIONADOS ===');
+      }
+
+      // 4. Login automático
+      console.log('=== PASO 4: LOGIN AUTOMÁTICO ===');
+      await authService.login(userData.email.trim().toLowerCase(), userData.password);
+      console.log('✓ Login exitoso');
+
+      // 5. Mostrar mensaje de éxito
+      console.log('=== REGISTRO COMPLETADO EXITOSAMENTE ===');
+      alert('¡Registro exitoso! Bienvenido a PuppyChop 🐕');
+
+      // 6. Redirigir
+      navigate('/');
+
+    } catch (err) {
+      console.error('=== ERROR EN EL REGISTRO ===');
+      console.error('Error completo:', err);
+      console.error('Error response:', err.response);
+      console.error('Error data:', err.response?.data);
+      
+      // Mostrar error más específico
+      let errorMessage = 'Error al registrar usuario. Por favor intenta de nuevo.';
+      
+      if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err.error) {
+        errorMessage = err.error;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -126,6 +306,21 @@ function RegisterPage() {
           Crea tu cuenta y descubre los mejores productos para tu peludo
         </p>
       </div>
+
+      {/* MENSAJE DE ERROR */}
+      {error && (
+        <div style={{
+          backgroundColor: '#fee2e2',
+          border: '2px solid #ef4444',
+          borderRadius: '8px',
+          padding: '16px',
+          marginBottom: '24px',
+          color: '#991b1b',
+          fontWeight: 'bold'
+        }}>
+          ⚠️ {error}
+        </div>
+      )}
 
       {/* PROGRESS BAR */}
       <div style={{
@@ -597,7 +792,7 @@ function RegisterPage() {
             </div>
           )}
 
-          {/* PASO 3: PRODUCTOS FAVORITOS */}
+          {/* PASO 3: PRODUCTOS FAVORITOS - AHORA CON PRODUCTOS DEL BACKEND */}
           {currentStep === 3 && (
             <div>
               <div style={{
@@ -651,7 +846,7 @@ function RegisterPage() {
                 </div>
               </div>
 
-              {/* Productos según categorías seleccionadas */}
+              {/* Productos según categorías seleccionadas - DEL BACKEND */}
               {categoriasSeleccionadas.length > 0 && (
                 <div>
                   <label style={{ display: 'block', fontWeight: '600', marginBottom: '12px', fontSize: '16px' }}>
@@ -688,13 +883,24 @@ function RegisterPage() {
                               transition: 'all 0.2s'
                             }}
                           >
-                            <div style={{ fontSize: '32px' }}>{producto.imagen}</div>
+                            {/* Emoji por categoría */}
+                            <div style={{ fontSize: '32px' }}>
+                              {producto.categoria === 'alimento' && '🍖'}
+                              {producto.categoria === 'snacks' && '🦴'}
+                              {producto.categoria === 'juguetes' && '🎾'}
+                              {producto.categoria === 'salud' && '💊'}
+                              {producto.categoria === 'higiene' && '🧴'}
+                              {producto.categoria === 'accesorios' && '🎒'}
+                            </div>
                             <div style={{ flex: 1 }}>
                               <h4 style={{ margin: '0 0 4px 0', fontWeight: 'bold', fontSize: '14px' }}>
                                 {producto.nombre}
                               </h4>
                               <p style={{ margin: 0, fontSize: '12px', color: '#6b7280' }}>
                                 {producto.descripcion}
+                              </p>
+                              <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#9ca3af' }}>
+                                Stock: {producto.stock}
                               </p>
                             </div>
                             <div style={{ textAlign: 'right' }}>
@@ -768,7 +974,13 @@ function RegisterPage() {
           gap: '16px'
         }}>
           {currentStep > 1 && (
-            <Button type="button" onClick={prevStep} variant="secondary" icon={ArrowLeft}>
+            <Button 
+              type="button" 
+              onClick={prevStep} 
+              variant="secondary" 
+              icon={ArrowLeft}
+              disabled={loading}
+            >
               Anterior
             </Button>
           )}
@@ -780,8 +992,13 @@ function RegisterPage() {
               Siguiente
             </Button>
           ) : (
-            <Button type="submit" variant="success" icon={CheckCircle}>
-              Completar Registro
+            <Button 
+              type="submit" 
+              variant="success" 
+              icon={CheckCircle}
+              disabled={loading}
+            >
+              {loading ? 'Registrando...' : 'Completar Registro'}
             </Button>
           )}
         </div>
