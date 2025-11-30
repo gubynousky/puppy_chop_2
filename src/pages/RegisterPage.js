@@ -43,16 +43,16 @@ function RegisterPage() {
   const [productosFavoritos, setProductosFavoritos] = useState([]);
   const [notificarOfertas, setNotificarOfertas] = useState(true);
 
-  // NUEVO: Estados para productos del backend
+  // Estados para productos del backend
   const [productosBackend, setProductosBackend] = useState([]);
   const [productosFiltered, setProductosFiltered] = useState([]);
 
-  // NUEVO: Cargar productos del backend al montar
+  // Cargar productos del backend al montar
   useEffect(() => {
     cargarProductosDelBackend();
   }, []);
 
-  // NUEVO: Filtrar productos cuando cambian las categorías
+  // Filtrar productos cuando cambian las categorías
   useEffect(() => {
     if (productosBackend.length > 0) {
       const filtrados = productosBackend.filter(p => 
@@ -62,13 +62,15 @@ function RegisterPage() {
     }
   }, [categoriasSeleccionadas, productosBackend]);
 
-  // NUEVO: Función para cargar productos desde el backend
+  // Función para cargar productos desde el backend
   const cargarProductosDelBackend = async () => {
     try {
+      console.log('🔍 Cargando productos desde el backend...');
       const productos = await productoService.obtenerProductos();
+      console.log('✅ Productos cargados:', productos);
       setProductosBackend(productos);
     } catch (err) {
-      console.error('Error al cargar productos:', err);
+      console.error('❌ Error al cargar productos:', err);
       setError('Error al cargar productos del servidor');
     }
   };
@@ -80,7 +82,7 @@ function RegisterPage() {
       ...userData,
       [name]: value
     });
-    setError(''); // Limpiar error al escribir
+    setError('');
   };
 
   // Handlers para Paso 2
@@ -90,7 +92,7 @@ function RegisterPage() {
       ...petData,
       [name]: value
     });
-    setError(''); // Limpiar error al escribir
+    setError('');
   };
 
   // Handlers para Paso 3
@@ -110,7 +112,7 @@ function RegisterPage() {
     }
   };
 
-  // NUEVO: Validaciones
+  // Validaciones
   const validarPaso1 = () => {
     if (!userData.nombre || !userData.apellido || !userData.email || 
         !userData.password || !userData.telefono || !userData.fechaNacimiento) {
@@ -151,8 +153,10 @@ function RegisterPage() {
     return true;
   };
 
-  // Navegación entre pasos
-  const nextStep = () => {
+  // CORREGIDO: Navegación entre pasos - previene submit
+  const nextStep = (e) => {
+    if (e) e.preventDefault();
+    
     setError('');
     
     if (currentStep === 1 && !validarPaso1()) {
@@ -163,17 +167,31 @@ function RegisterPage() {
       return;
     }
     
-    if (currentStep < 3) setCurrentStep(currentStep + 1);
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
   };
 
-  const prevStep = () => {
+  const prevStep = (e) => {
+    if (e) e.preventDefault();
     setError('');
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  // CORREGIDO: Submit final con mejor manejo de errores
+  // CORREGIDO: Submit final - SOLO se ejecuta en paso 3
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    console.log('📍 handleSubmit llamado en paso:', currentStep);
+    
+    // SI NO ESTAMOS EN PASO 3, SOLO AVANZAR AL SIGUIENTE PASO
+    if (currentStep !== 3) {
+      console.log('⏭️ No estamos en paso 3, avanzando al siguiente paso...');
+      nextStep(e);
+      return;
+    }
+    
+    console.log('✅ Estamos en paso 3, procediendo con el registro...');
     setLoading(true);
     setError('');
 
@@ -222,11 +240,13 @@ function RegisterPage() {
       if (productosFavoritos.length > 0) {
         console.log('=== PASO 3: AGREGANDO FAVORITOS ===');
         console.log('Total de favoritos a agregar:', productosFavoritos.length);
+        console.log('IDs de favoritos:', productosFavoritos);
+        console.log('Productos en backend:', productosBackend.length);
         
         for (const productoId of productosFavoritos) {
           const producto = productosBackend.find(p => p.id === productoId);
           if (producto) {
-            console.log(`Agregando favorito: ${producto.nombre} (ID: ${productoId})`);
+            console.log(`📦 Agregando favorito: ${producto.nombre} (ID: ${productoId})`);
             try {
               await favoritoService.agregarFavorito(
                 userId,
@@ -234,11 +254,13 @@ function RegisterPage() {
                 producto.categoria,
                 notificarOfertas
               );
-              console.log(`✓ Favorito agregado: ${producto.nombre}`);
+              console.log(`✅ Favorito agregado: ${producto.nombre}`);
             } catch (favError) {
-              console.error(`Error al agregar favorito ${productoId}:`, favError);
+              console.error(`❌ Error al agregar favorito ${productoId}:`, favError);
               // Continuar con los demás favoritos aunque uno falle
             }
+          } else {
+            console.warn(`⚠️ Producto ${productoId} no encontrado en productosBackend`);
           }
         }
         console.log('✓ Favoritos procesados');
@@ -319,6 +341,21 @@ function RegisterPage() {
           fontWeight: 'bold'
         }}>
           ⚠️ {error}
+        </div>
+      )}
+
+      {/* INDICADOR DE CARGA DE PRODUCTOS */}
+      {productosBackend.length === 0 && currentStep === 3 && (
+        <div style={{
+          backgroundColor: '#fef3c7',
+          border: '2px solid #f59e0b',
+          borderRadius: '8px',
+          padding: '16px',
+          marginBottom: '24px',
+          color: '#92400e',
+          fontWeight: 'bold'
+        }}>
+          ⏳ Cargando productos desde el servidor...
         </div>
       )}
 
@@ -792,7 +829,7 @@ function RegisterPage() {
             </div>
           )}
 
-          {/* PASO 3: PRODUCTOS FAVORITOS - AHORA CON PRODUCTOS DEL BACKEND */}
+          {/* PASO 3: PRODUCTOS FAVORITOS - CON PRODUCTOS DEL BACKEND */}
           {currentStep === 3 && (
             <div>
               <div style={{
@@ -966,7 +1003,7 @@ function RegisterPage() {
           )}
         </div>
 
-        {/* BOTONES DE NAVEGACIÓN */}
+        {/* BOTONES DE NAVEGACIÓN - CORREGIDOS */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -988,7 +1025,12 @@ function RegisterPage() {
           <div style={{ flex: 1 }} />
 
           {currentStep < 3 ? (
-            <Button type="button" onClick={nextStep} variant="primary" icon={ArrowRight}>
+            <Button 
+              type="button" 
+              onClick={nextStep} 
+              variant="primary" 
+              icon={ArrowRight}
+            >
               Siguiente
             </Button>
           ) : (
