@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Dog, Heart, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
+
+import { User, Dog, Heart, ArrowRight, ArrowLeft, CheckCircle, Users } from 'lucide-react';
 import Button from '../components/atoms/Button';
 import { categorias } from '../data/productos';
 import authService from '../services/authService';
@@ -1045,6 +1046,26 @@ function RegisterPage() {
           )}
         </div>
       </form>
+
+      {/* BOTÓN PARA VER USUARIOS REGISTRADOS */}
+<div style={{
+  marginTop: '30px',
+  textAlign: 'center',
+  paddingTop: '20px',
+  borderTop: '2px solid #fed7aa'
+}}>
+  <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '10px' }}>
+    ¿Quieres ver los usuarios registrados?
+  </p>
+  <Button
+    type="button"
+    onClick={() => navigate('/usuarios')}
+    variant="secondary"
+    icon={Users}
+  >
+    Ver Usuarios Registrados
+  </Button>
+</div>
     </div>
   );
 }

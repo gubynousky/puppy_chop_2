@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import CatalogoPage from './pages/CatalogoPage';
 import CarritoPage from './pages/CarritoPage';
 import RegisterPage from './pages/RegisterPage';
+import UserListPage from './pages/UserListPage';
 
 function App() {
   const [carrito, setCarrito] = useState(() => {
@@ -73,6 +74,7 @@ function App() {
         <Route path="/" element={<MainLayout cantidadCarrito={cantidadTotal} carrito={carrito} />}>
           <Route index element={<HomePage />} />
           <Route path="catalogo" element={<CatalogoPage onAgregarAlCarrito={agregarAlCarrito} />} />
+          <Route path="/usuarios" element={<UserListPage />} />
           <Route path="carrito" element={
             <CarritoPage
               carrito={carrito}
