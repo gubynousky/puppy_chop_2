@@ -223,21 +223,36 @@ function Navbar({ cantidadCarrito, carrito }) {
             {user ? (
               // USUARIO LOGUEADO
               <>
-                {/* Saludo */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  whiteSpace: 'nowrap'
-                }}>
+                {/* Saludo CLICKEABLE - Redirige a perfil */}
+                <Link
+                  to="/perfil"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    whiteSpace: 'nowrap',
+                    color: 'white',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
                   <User size={18} />
                   <span>Hola, {user.nombre}</span>
-                </div>
+                </Link>
 
                 {/* Botón Cerrar Sesión */}
                 <button

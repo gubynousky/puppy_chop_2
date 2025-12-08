@@ -6,8 +6,9 @@ import HomePage from './pages/HomePage';
 import CatalogoPage from './pages/CatalogoPage';
 import CarritoPage from './pages/CarritoPage';
 import RegisterPage from './pages/RegisterPage';
-import LoginPage from './pages/LoginPage'; // ← NUEVA IMPORTACIÓN
+import LoginPage from './pages/LoginPage';
 import UserListPage from './pages/UserListPage';
+import ProfilePage from './pages/ProfilePage'; // ← NUEVA IMPORTACIÓN
 
 function App() {
   const [carrito, setCarrito] = useState(() => {
@@ -80,6 +81,7 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="catalogo" element={<CatalogoPage onAgregarAlCarrito={agregarAlCarrito} />} />
           <Route path="usuarios" element={<UserListPage />} />
+          <Route path="perfil" element={<ProfilePage />} /> {/* ← NUEVA RUTA */}
           <Route path="carrito" element={
             <CarritoPage
               carrito={carrito}
