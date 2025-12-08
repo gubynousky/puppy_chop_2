@@ -1,12 +1,42 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Home, Search, Dog, UserPlus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ShoppingCart, Home, Search, UserPlus, LogIn, LogOut, User } from 'lucide-react';
 import CartDropdown from './CartDropdown';
 
 function Navbar({ cantidadCarrito, carrito }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const isActive = (path) => location.pathname === path;
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  // Cargar usuario desde localStorage al montar el componente
+  useEffect(() => {
+    const loadUser = () => {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (error) {
+          console.error('Error al parsear usuario:', error);
+          localStorage.removeItem('user');
+        }
+      }
+    };
+
+    loadUser();
+
+    // Escuchar cambios en localStorage
+    window.addEventListener('storage', loadUser);
+    
+    // Polling para detectar cambios en la misma pestaña
+    const interval = setInterval(loadUser, 1000);
+
+    return () => {
+      window.removeEventListener('storage', loadUser);
+      clearInterval(interval);
+    };
+  }, []);
 
   const toggleCart = (e) => {
     e.preventDefault();
@@ -17,7 +47,17 @@ function Navbar({ cantidadCarrito, carrito }) {
     setIsCartOpen(false);
   };
 
+  const handleLogout = () => {
+    if (window.confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+      localStorage.removeItem('user');
+      setUser(null);
+      navigate('/');
+      alert('Sesión cerrada exitosamente');
+    }
+  };
+
   console.log('Navbar renderizado - items en carrito:', cantidadCarrito);
+  console.log('Usuario logueado:', user);
 
   return (
     <>
@@ -39,6 +79,7 @@ function Navbar({ cantidadCarrito, carrito }) {
           flexWrap: 'wrap',
           gap: '16px'
         }}>
+          {/* LOGO */}
           <Link
             to="/"
             style={{
@@ -55,6 +96,7 @@ function Navbar({ cantidadCarrito, carrito }) {
             <span style={{ whiteSpace: 'nowrap' }}>PuppyChop</span>
           </Link>
           
+          {/* NAVEGACIÓN CENTRAL */}
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -72,8 +114,11 @@ function Navbar({ cantidadCarrito, carrito }) {
                 textDecoration: 'none',
                 fontWeight: isActive('/') ? 'bold' : 'normal',
                 fontSize: '16px',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                transition: 'opacity 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               <Home size={20} />
               <span>Inicio</span>
@@ -89,14 +134,17 @@ function Navbar({ cantidadCarrito, carrito }) {
                 textDecoration: 'none',
                 fontWeight: isActive('/catalogo') ? 'bold' : 'normal',
                 fontSize: '16px',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                transition: 'opacity 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               <Search size={20} />
               <span>Catálogo</span>
             </Link>
             
-            {/* Botón que abre el dropdown en lugar de navegar */}
+            {/* Botón Carrito */}
             <button
               onClick={toggleCart}
               style={{
@@ -111,8 +159,11 @@ function Navbar({ cantidadCarrito, carrito }) {
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                fontWeight: isActive('/carrito') ? 'bold' : 'normal'
+                fontWeight: isActive('/carrito') ? 'bold' : 'normal',
+                transition: 'opacity 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               <ShoppingCart size={20} />
               <span>Carrito</span>
@@ -137,23 +188,156 @@ function Navbar({ cantidadCarrito, carrito }) {
                 </span>
               )}
             </button>
-            
-            <Link
-              to="/registro"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: 'white',
-                textDecoration: 'none',
-                fontWeight: isActive('/registro') ? 'bold' : 'normal',
-                fontSize: '16px',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              <UserPlus size={20} />
-              <span>Registro</span>
-            </Link>
+
+            {/* Mostrar "Usuarios" solo si está logueado */}
+            {user && (
+              <Link
+                to="/usuarios"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  color: 'white',
+                  textDecoration: 'none',
+                  fontWeight: isActive('/usuarios') ? 'bold' : 'normal',
+                  fontSize: '16px',
+                  whiteSpace: 'nowrap',
+                  transition: 'opacity 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+              >
+                <User size={20} />
+                <span>Usuarios</span>
+              </Link>
+            )}
+          </div>
+
+          {/* SECCIÓN DERECHA - LOGIN/LOGOUT */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            flexWrap: 'wrap'
+          }}>
+            {user ? (
+              // USUARIO LOGUEADO
+              <>
+                {/* Saludo */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  whiteSpace: 'nowrap'
+                }}>
+                  <User size={18} />
+                  <span>Hola, {user.nombre}</span>
+                </div>
+
+                {/* Botón Cerrar Sesión */}
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    backgroundColor: 'white',
+                    color: '#ea580c',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '10px 20px',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    whiteSpace: 'nowrap'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#fed7aa';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'white';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <LogOut size={18} />
+                  <span>Cerrar Sesión</span>
+                </button>
+              </>
+            ) : (
+              // USUARIO NO LOGUEADO
+              <>
+                {/* Botón Iniciar Sesión */}
+                <Link
+                  to="/login"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    backgroundColor: 'white',
+                    color: '#ea580c',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '10px 20px',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s',
+                    whiteSpace: 'nowrap'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#fed7aa';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'white';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <LogIn size={18} />
+                  <span>Iniciar Sesión</span>
+                </Link>
+
+                {/* Botón Registrarse */}
+                <Link
+                  to="/registro"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    backgroundColor: '#fed7aa',
+                    color: '#ea580c',
+                    border: '2px solid white',
+                    borderRadius: '8px',
+                    padding: '10px 20px',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s',
+                    whiteSpace: 'nowrap'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'white';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#fed7aa';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <UserPlus size={18} />
+                  <span>Registrarse</span>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>

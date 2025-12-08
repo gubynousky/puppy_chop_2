@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import CatalogoPage from './pages/CatalogoPage';
 import CarritoPage from './pages/CarritoPage';
 import RegisterPage from './pages/RegisterPage';
+import LoginPage from './pages/LoginPage'; // ← NUEVA IMPORTACIÓN
 import UserListPage from './pages/UserListPage';
 
 function App() {
@@ -71,10 +72,14 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* RUTA DE LOGIN - SIN LAYOUT (pantalla completa) */}
+        <Route path="/login" element={<LoginPage />} />
+        
+        {/* RUTAS CON LAYOUT */}
         <Route path="/" element={<MainLayout cantidadCarrito={cantidadTotal} carrito={carrito} />}>
           <Route index element={<HomePage />} />
           <Route path="catalogo" element={<CatalogoPage onAgregarAlCarrito={agregarAlCarrito} />} />
-          <Route path="/usuarios" element={<UserListPage />} />
+          <Route path="usuarios" element={<UserListPage />} />
           <Route path="carrito" element={
             <CarritoPage
               carrito={carrito}
