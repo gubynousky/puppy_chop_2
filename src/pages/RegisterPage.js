@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { User, Dog, Heart, ArrowRight, ArrowLeft, CheckCircle, Users } from 'lucide-react';
 import Button from '../components/atoms/Button';
 import { categorias } from '../data/productos';
