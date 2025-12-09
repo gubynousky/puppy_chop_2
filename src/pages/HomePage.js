@@ -64,11 +64,6 @@ function HomePage() {
             Ver Carrito
           </Button>
         </Link>
-        <Link to="/contacto">
-          <Button variant="success" icon={Mail}>
-            Contáctanos
-          </Button>
-        </Link>
       </div>
 
 <div 
